@@ -1,1 +1,45 @@
-
+<h1> <%= @post.title %></h1>
+<br>
+<p> <%= @post.content %></p>
+<br>
+<h2>Categories</h2>
+<ul>
+  <% @post.categories.each do |cat| %>
+    <li><%= cat.name %></li>
+  <% end %>
+</ul>
+<%= form_for @comment do |f| %>
+  <%= f.label "Add a comment:"%>
+  <br>
+  <%= f.text_area :content %>
+  <br><br>
+  <p>Select a User:</p>
+  <%# <%= f.text_field :user_id, list: "user" %> 
+  <%# <datalist id="user"> %>
+    <%# User.all.each do |u| %>
+      <%# <option value="= u.username"> %>
+    <%# end %>
+  <%# </datalist> %>
+  <%= f.collection_select :user_id, User.all, :id, :username, :include_blank => true %>
+  <br>
+  <p>New user? Enter a Username:</p>
+  <%= f.fields_for :user_attributes, User.new do |username| %>
+    <%= username.text_field :username %>
+  <% end %>
+  <%= f.hidden_field :post_id, value: @post.id %>
+  <br>
+  <br>
+  <%= f.submit %>
+<% end %>
+<h3>Comments: </h3>
+<ul>
+  <% @post.uniq_users.each do |user| %>
+    <li>
+      <p><%=link_to user.username, user_path(user)%> says:
+        <% @post.comments.select { |c| c.user == user }.each do |comment|%>
+          <%= comment.content%> || 
+        <% end %>
+        </p>
+    </li>
+  <% end %>
+</ul>
